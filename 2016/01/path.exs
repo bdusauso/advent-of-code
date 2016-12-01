@@ -3,7 +3,6 @@ defmodule AoC.Path do
   def run(paths) do
     paths
     |> String.split(", ")
-    |> IO.inspect
     |> Enum.reduce({0, 0, :north}, fn path, acc -> walk(acc, path) end)
   end
 
