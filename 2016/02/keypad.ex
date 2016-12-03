@@ -5,17 +5,15 @@ defmodule AoC.Keypad do
   @vertical_move    3
   @horizontal_move  1
 
-  def get_secret_code(input_lines) do
-    last_key = input_lines
-    |> Enum.reduce(@start_key_idx,
-      fn input_line, next_start_key ->
-        IO.puts "=> Digit: #{next_start_key + 1}"
-        next_key(input_line, next_start_key)
-      end)
-    IO.puts "=> Digit: #{last_key + 1}"
+  def secret_code(input_lines) do
+    input_lines
+    |> Enum.reduce([@start_key_idx], &([next_key(&1, hd(&2)) | &2]))
+    |> Enum.reverse
+    |> Enum.drop(1)
+    |> Enum.map(&(&1 + 1))
   end
 
-  def next_key(input_line, start_key) do
+  defp next_key(input_line, start_key) do
     input_line
     |> String.codepoints
     |> Enum.reduce(start_key, fn movement, start_index -> move(movement, start_index) end)
