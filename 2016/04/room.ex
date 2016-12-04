@@ -1,5 +1,11 @@
 defmodule AoC.Room do
 
+  def sector_ids_sum(names) do
+    names
+    |> Enum.filter(&real/1)
+    |> Enum.reduce(0, &(&2 + (AoC.Room.sector_id(&1) |> String.to_integer)))
+  end
+
   def real(name) do
     calculate_checksum(name) == extract_checksum(name)
   end
