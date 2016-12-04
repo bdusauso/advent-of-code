@@ -16,17 +16,13 @@ defmodule AoC.Room do
 
   def calculate_checksum(name) do
     name
-    |> String.split("-")
-    |> Enum.drop(-1)
-    |> Enum.join
-    |> letter_occurrences
-    |> Enum.to_list
-    |> Enum.sort_by(fn {_, count} -> count end, &>=/2)
-    |> Enum.take(5)
-    |> Enum.reduce("", fn e, x -> x <> elem(e, 0) end)
+    |> normalize_name
+    |> count_letter_occurences
+    |> extract_highest_occurrences_letters
+    |> concatenate_highest_occurences_letters
   end
 
-  defp letter_occurrences(name) do
+  defp count_letter_occurences(name) do
     name
     |> String.codepoints
     |> Enum.reduce(%{},
@@ -34,6 +30,25 @@ defmodule AoC.Room do
         occurences
         |> Map.update(letter, 1, &(&1+ 1))
       end)
+  end
+
+  defp extract_highest_occurrences_letters(occurences) do
+    occurences
+    |> Enum.to_list
+    |> Enum.sort_by(fn {_, count} -> count end, &>=/2)
+    |> Enum.take(5)
+  end
+
+  defp concatenate_highest_occurences_letters(occurences) do
+    occurences
+    |> Enum.reduce("", &(&2 <> elem(&1, 0)))
+  end
+
+  defp normalize_name(name) do
+    name
+    |> String.split("-")
+    |> Enum.drop(-1)
+    |> Enum.join
   end
 
   defp first_match(regex, str) do
