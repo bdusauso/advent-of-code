@@ -8,10 +8,7 @@ defmodule AoC.Abba do
 
   def support_tls(ip_address) do
     [outside, inside] = partition(ip_address)
-    outs = outside |> Enum.any?(&abba/1)
-    ins  = inside  |> Enum.any?(&abba/1)
-
-    outs && !ins
+    (outside |> Enum.any?(&abba/1)) && !(inside |> Enum.any?(&abba/1))
   end
 
   defp abba(ip_chunk) do
