@@ -11,18 +11,17 @@ defmodule AoC.Path do
 
   def duplicates(paths) do
     locations = paths |> run |> Enum.map(fn {x, y, _} -> {x, y} end)
-    index =
     locations
     |> Enum.with_index
     |> Enum.reduce(:none, fn {current, idx}, acc ->
         case acc do
-          :none -> locations |> index_of_duplicate(current, idx)
+          :none -> locations |> first_duplicate(current, idx)
           found -> found
         end
       end)
   end
 
-  def index_of_duplicate(list, element, index) do
+  def first_duplicate(list, element, index) do
     case list |> Enum.drop(index + 1) |> Enum.find(&(&1 == element)) do
       nil -> :none
       idx -> element
