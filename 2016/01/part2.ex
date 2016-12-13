@@ -10,10 +10,23 @@ defmodule AoC.Path do
   end
 
   def duplicates(paths) do
-    paths
-    |> run
-    |> Enum.reduce(%{}, fn location, occurrences -> occurrences |> Map.update(location, 1, &(&1 + 1)) end)
-    |> Enum.max_by(&(elem(&1, 1)))
+    locations = paths |> run |> Enum.map(fn {x, y, _} -> {x, y} end)
+    index =
+    locations
+    |> Enum.with_index
+    |> Enum.reduce(:none, fn {current, idx}, acc ->
+        case acc do
+          :none -> locations |> index_of_duplicate(current, idx)
+          found -> found
+        end
+      end)
+  end
+
+  def index_of_duplicate(list, element, index) do
+    case list |> Enum.drop(index + 1) |> Enum.find(&(&1 == element)) do
+      nil -> :none
+      idx -> element
+    end
   end
 
   defp walk({x, y, :north}, "L" <> blocks), do: for b <- 1..String.to_integer(blocks), do:  {x - b, y, :west}
