@@ -12,15 +12,16 @@ defmodule Captcha do
   end
 end
 
-next_digit = fn _ -> 1 end
-halfway_around = fn digits -> div(length(digits), 2) end
-
 # Input sanitization
 input = "input.txt"
         |> File.read!()
         |> String.trim
         |> String.codepoints
         |> Enum.map(&String.to_integer/1)
+
+# Real work happens here
+next_digit = fn _ -> 1 end
+halfway_around = fn digits -> div(length(digits), 2) end
 
 IO.puts "With 'next_digit': #{Captcha.captcha(input, next_digit)}"
 IO.puts "With 'halfway_around': #{Captcha.captcha(input, halfway_around)}"
