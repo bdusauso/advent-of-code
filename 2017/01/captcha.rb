@@ -5,7 +5,7 @@ def captcha(input, dist_fun)
 
   sum = 0
 
-  input.each_with_index do |digit, index|
+  input[0, input.size - distance].each_with_index do |digit, index|
     sum += digit if digit == input[index + distance]
   end
 
