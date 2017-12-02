@@ -29,7 +29,7 @@ IO.puts Captcha.captcha(input, halfway_around)
 
 # Testing
 ExUnit.start()
-defmodule CaptachTest do
+defmodule CaptchaTest do
   use ExUnit.Case, async: true
 
   test "Captcha with next digit" do
