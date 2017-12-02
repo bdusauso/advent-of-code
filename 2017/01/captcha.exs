@@ -1,11 +1,14 @@
 defmodule Captcha do
   def captcha(digits, dist_func) do
-    distance = dist_func.(digits)
-    digits   = digits ++ Enum.take(digits, distance)
-
     digits
     |> Enum.with_index
-    |> Enum.reduce(0, fn {digit, index}, sum -> if Enum.at(digits, index + distance) == digit, do: sum + digit, else: sum; end)
+    |> Enum.reduce(0, fn {digit, index}, sum -> 
+      if Enum.at(digits, rem(index + dist_func.(digits), length(digits))) == digit do 
+        sum + digit 
+      else 
+        sum 
+      end
+    end)
   end
 end
 
