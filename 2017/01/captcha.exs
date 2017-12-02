@@ -22,10 +22,8 @@ input = "input.txt"
         |> String.codepoints
         |> Enum.map(&String.to_integer/1)
 
-IO.inspect(input)
-
-IO.puts Captcha.captcha(input, next_digit)
-IO.puts Captcha.captcha(input, halfway_around)
+IO.puts "With 'next_digit': #{Captcha.captcha(input, next_digit)}"
+IO.puts "With 'halfway_around': #{Captcha.captcha(input, halfway_around)}"
 
 # Testing
 ExUnit.start()
