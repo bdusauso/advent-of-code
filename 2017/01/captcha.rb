@@ -1,3 +1,4 @@
+# My solution
 def captcha(input, dist_fun)
   distance = dist_fun.call(input)
 
@@ -10,6 +11,11 @@ def captcha(input, dist_fun)
   end
 
   sum
+end
+
+# Improved solution based on other participants code
+def captcha2(input, dist_fun)
+  input.select.each_with_index { |d, i| d == input[(i + dist_fun.call(input)) % input.size] }.sum
 end
 
 next_digit     = ->(input) { 1 }
