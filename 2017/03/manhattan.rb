@@ -11,6 +11,8 @@ def max_number_on_line(line)
 end
 
 def coordinates(number)
+  return 0 if number == 1
+  
   corners       = [Complex(1, -1), Complex(1, 1), Complex(-1, 1), Complex(-1, -1)]
   displacements = [Complex(0, 1), Complex(-1, 0), Complex(0, -1), Complex(1, 0)]
 
@@ -22,15 +24,10 @@ def coordinates(number)
   quotient                = distance_to_number / numbers_on_side 
   remainder               = distance_to_number % numbers_on_side
 
-  position = (corners[quotient] * line + displacements[quotient] * remainder)
-  
-  position.imag.abs + position.real.abs
+  corners[quotient] * line + displacements[quotient] * remainder
 end
 
-# puts coordinates(1).inspect
-# puts coordinates(2).inspect
-# puts coordinates(7).inspect
-# puts coordinates(16).inspect
-# puts coordinates(27).inspect
-
-puts coordinates(277678)
+[1, 12, 23, 1024, 277678].each do |number|
+  position = coordinates(number)
+  puts "Manhattan distance for #{number}: #{position.imag.abs + position.real.abs}"
+end
