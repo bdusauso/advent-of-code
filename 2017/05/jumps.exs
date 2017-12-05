@@ -23,8 +23,7 @@ defmodule AoCTest do
   end    
 
   test "number of jumps for [0 3  0  1  -3] should be 5 when increment is -1 if offset >= 3 and +1 otherwise" do
-    assert AoC.jumps_count([0, 3, 0, 1, -3], 
-                           fn offset -> if offset >= 3, do: offset - 1, else: offset + 1 end) == 10
+    assert AoC.jumps_count([0, 3, 0, 1, -3], &(if &1 >= 3, do: &1 - 1, else: &1 + 1)) == 10
   end    
 end
 
@@ -37,5 +36,5 @@ input = "input.txt"
 input |> AoC.jumps_count(&(&1 + 1))
       |> IO.inspect(label: "Part 1")
 
-input |> AoC.jumps_count(fn offset -> if offset >= 3, do: offset - 1, else: offset + 1 end)
+input |> AoC.jumps_count(&(if &1 >= 3, do: &1 - 1, else: &1 + 1))
       |> IO.inspect(label: "Part 2")
