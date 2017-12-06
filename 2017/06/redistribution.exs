@@ -1,11 +1,13 @@
-defmodule AoC do
+defmodule AoC do  
   def find_recurrent_distribution(banks) do
-    Enum.reduce_while(Stream.iterate(0, &(&1)), [banks], fn _, acc ->
-      next = redistribute(List.first(acc))
-      if next in acc, do: {:halt, acc}, else: {:cont, [next | acc]}
-    end)
+    _find_recurrent_distribution([banks])
   end
-  
+
+  defp _find_recurrent_distribution(redistributions) do
+    next = redistributions |> List.first |> redistribute
+    if next in redistributions, do: redistributions, else: _find_recurrent_distribution([next | redistributions])
+  end
+
   def redistribute(banks) do
     max  = Enum.max(banks)
     from = Enum.find_index(banks, &(&1 == max))
