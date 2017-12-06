@@ -1,0 +1,56 @@
+defmodule AoC do
+  def find_recurrent_distribution(banks) do
+    [banks] 
+    |> Stream.iterate(&([redistribute(List.first(&1)) | &1]))
+    |> Enum.take_while(fn l -> !Enum.member?(Enum.drop(l, 1), List.first(l)) end)
+    |> length
+  end
+
+  def redistribute(banks) do
+    max  = Enum.max(banks)
+    from = Enum.find_index(banks, &(&1 == max))
+
+    _redistribute(List.update_at(banks, from, fn _ -> 0 end), from, max)
+  end
+
+  defp _redistribute(banks, _, 0), do: banks
+  defp _redistribute(banks, from, to_redistribute) do
+    next_index = rem(from + 1, length(banks))
+    _redistribute(List.update_at(banks, next_index, &(&1 + 1)), 
+                  next_index, 
+                  to_redistribute - 1)
+  end
+end
+
+ExUnit.start
+
+defmodule AoCTest do
+  use ExUnit.Case, async: true
+
+  test "redistributing [0 2 7 0]" do
+    assert AoC.redistribute([0, 2, 7, 0]) == [2, 4, 1, 2]
+  end
+
+  test "redistributing [2 4 1 2]" do
+    assert AoC.redistribute([2, 4, 1, 2]) == [3, 1, 2, 3]
+  end
+
+  test "redistributing [3 1 2 3]" do
+    assert AoC.redistribute([3, 1, 2, 3]) == [0, 2, 3, 4]
+  end
+
+  test "redistributing [0 2 3 4]" do
+    assert AoC.redistribute([0, 2, 3, 4]) == [1, 3, 4, 1]
+  end
+
+  test "redistributing [1 3 4 1]" do
+    assert AoC.redistribute([1, 3, 4, 1]) == [2, 4, 1, 2]
+  end
+
+  test "find first recurrent distribution" do
+    assert AoC.find_recurrent_distribution([0, 2, 7, 0]) == 5
+  end
+end
+
+input = [4, 10, 4, 1, 8, 4, 9, 14, 5, 1, 14, 15, 0, 15, 3, 5]
+IO.puts AoC.find_recurrent_distribution(input)
