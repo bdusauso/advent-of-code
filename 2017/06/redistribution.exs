@@ -3,6 +3,7 @@ defmodule AoC do
     [banks] 
     |> Stream.iterate(&([redistribute(List.first(&1)) | &1]))
     |> Enum.take_while(fn l -> !Enum.member?(Enum.drop(l, 1), List.first(l)) end)
+    |> List.last
   end
 
   def redistribute(banks) do
@@ -65,6 +66,5 @@ distributions
 |> IO.puts
 
 # Part 2
-Enum.find_index(distributions |> List.last, 
-                &(&1 == distributions |> List.last |> List.first |> AoC.redistribute)) + 1
+Enum.find_index(distributions,  &(&1 == distributions |> List.first |> AoC.redistribute)) + 1
 |> IO.puts
