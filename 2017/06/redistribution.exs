@@ -3,7 +3,6 @@ defmodule AoC do
     [banks] 
     |> Stream.iterate(&([redistribute(List.first(&1)) | &1]))
     |> Enum.take_while(fn l -> !Enum.member?(Enum.drop(l, 1), List.first(l)) end)
-    |> length
   end
 
   def redistribute(banks) do
@@ -48,9 +47,24 @@ defmodule AoCTest do
   end
 
   test "find first recurrent distribution" do
-    assert AoC.find_recurrent_distribution([0, 2, 7, 0]) == 5
+    assert AoC.find_recurrent_distribution([0, 2, 7, 0]) |> length == 5
+  end
+
+  test "find index of cycle" do
+    res = AoC.find_recurrent_distribution([0, 2, 7, 0])
+    assert Enum.find_index(res, fn elem -> elem == List.last(res) end) == 4
   end
 end
 
 input = [4, 10, 4, 1, 8, 4, 9, 14, 5, 1, 14, 15, 0, 15, 3, 5]
-IO.puts AoC.find_recurrent_distribution(input)
+distributions = input |> AoC.find_recurrent_distribution
+
+# Part 1
+distributions 
+|> length
+|> IO.puts
+
+# Part 2
+Enum.find_index(distributions |> List.last, 
+                &(&1 == distributions |> List.last |> List.first |> AoC.redistribute)) + 1
+|> IO.puts
