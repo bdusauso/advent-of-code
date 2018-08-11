@@ -14,15 +14,7 @@ defmodule Day8 do
   def remove_operation(action), do: Map.delete(action, "operation")
 
   defp condition_met?(registers, %{"subject" => subj, "test" => test, "value" => val}) do
-    to_compare = Map.get(registers, subj, 0)
-    case test do
-      "<"  -> to_compare < val
-      ">"  -> to_compare > val
-      "<=" -> to_compare <= val
-      ">=" -> to_compare >= val
-      "==" -> to_compare == val
-      "!=" -> to_compare != val
-    end
+    apply(Kernel, test, [Map.get(registers, subj, 0), val])
   end
 
   def to_integer(action) do
