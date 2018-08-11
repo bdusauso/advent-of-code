@@ -43,5 +43,5 @@ end
   |> String.split("\n")
   |> Day8.run
 
-IO.inspect(registers |> Map.values |> Enum.max, label: "Highest value in registers")
-IO.inspect(maximum, label: "Highest values at all time")
+IO.inspect(registers |> Map.values |> Enum.max, label: "Highest final value in registers")
+IO.inspect(maximum, label: "Highest value at all time")
