@@ -23,6 +23,20 @@ defmodule Checksum do
       end
     end)
   end
+
+  def common_letters(ids) do
+    ids_subsets = 
+      ids
+      |> Enum.map(&generate_subsets/1)
+      |> List.flatten
+
+    (ids_subsets -- Enum.uniq(ids_subsets)) |> List.first
+  end
+
+  def generate_subsets(id) do
+    codepoints = String.codepoints(id)
+    Enum.map(0..(String.length(id) - 1), &({&1, codepoints |> List.delete_at(&1) |> Enum.join}))
+  end
 end
 
 ExUnit.start
@@ -55,6 +69,13 @@ defmodule ChecksumTest do
       assert Checksum.count_duplicates("ababab") == {0, 1}
     end
   end
+
+  describe "common_letters/1" do
+    test "it produces a subset of all ids minus one letter and find the matching ones" do
+      ids = ~w(abcde fghij klmno pqrst fguij axcye wvxyz)
+      assert Checksum.common_letters(ids) == {2, "fgij"}
+    end
+  end
 end
 
 ids =
@@ -62,4 +83,5 @@ ids =
   |> File.read!
   |> String.split("\n")
 
-IO.puts Checksum.checksum(ids)
+IO.puts "Checksum: #{Checksum.checksum(ids)}"
+IO.puts "Common letters: #{Checksum.common_letters(ids) |> elem(1)}"
