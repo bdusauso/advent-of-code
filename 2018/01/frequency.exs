@@ -10,8 +10,9 @@ defmodule Frequency do
     |> Enum.reduce_while([0], fn frequency, partial_sums ->
         current_sum = List.first(partial_sums) + frequency 
         new_partial_sums = [current_sum | partial_sums]
+        status = if Enum.member?(partial_sums, current_sum), do: :halt, else: :cont
         
-        if Enum.member?(partial_sums, current_sum), do: {:halt, new_partial_sums}, else: {:cont, new_partial_sums}
+        {status, new_partial_sums}
     end)
     |> List.first
   end
@@ -19,9 +20,9 @@ end
 
 frequencies = 
   "input.txt"
-  |> File.read!
-  |> String.split("\n")
-  |> Enum.map(&String.to_integer/1)
+  |> File.stream!([])
+  |> Stream.map(&String.trim/1)
+  |> Stream.map(&String.to_integer/1)
 
 IO.puts(Frequency.apply_changes(frequencies))
 IO.puts(Frequency.find_repetition(frequencies))

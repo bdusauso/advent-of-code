@@ -33,7 +33,7 @@ defmodule Checksum do
     (ids_subsets -- Enum.uniq(ids_subsets)) |> List.first
   end
 
-  def generate_subsets(id) do
+  defp generate_subsets(id) do
     codepoints = String.codepoints(id)
     Enum.map(0..(String.length(id) - 1), &({&1, codepoints |> List.delete_at(&1) |> Enum.join}))
   end
@@ -78,10 +78,7 @@ defmodule ChecksumTest do
   end
 end
 
-ids =
-  "input.txt"
-  |> File.read!
-  |> String.split("\n")
+ids = File.stream!("input.txt", [])
 
 IO.puts "Checksum: #{Checksum.checksum(ids)}"
 IO.puts "Common letters: #{Checksum.common_letters(ids) |> elem(1)}"
