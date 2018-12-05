@@ -1,24 +1,36 @@
 defmodule AlchemicalReduction do
   def reduce_polymer(polymer) do
-    reduce([], polymer) |> Enum.reverse
+    polymer
+    |> String.codepoints
+    |> reduce([]) 
+    |> Enum.reverse
+    |> Enum.join
   end
 
+  def shortest_reduction(polymer) do
+    ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
+    |> Stream.map(fn unit -> polymer |> String.replace(unit, "") |> String.replace(String.upcase(unit), "") end) 
+    |> Stream.map(&reduce_polymer/1)
+    |> Stream.map(&String.length/1)
+    |> Enum.min
+  end
+  
   def opposite?(a, b) do
     {String.downcase(b), String.upcase(a)} == {a, b} || 
       {String.upcase(b), String.downcase(a)} == {a, b}  
   end
 
-  defp reduce(previous, [a, b | rest]) do
+  defp reduce([a, b | rest], previous) do
     if opposite?(a, b) do
       case previous do
-        []      -> reduce([], rest)
-        [h | t] -> reduce(t, [h | rest])
+        []      -> reduce(rest, [])
+        [h | t] -> reduce([h | rest], t)
       end
     else
-      reduce([a | previous], [b | rest])
+      reduce([b | rest], [a | previous])
     end
   end
-  defp reduce(previous, [a]), do: [a | previous]
+  defp reduce([a], previous), do: [a | previous]
 end
 
 ExUnit.start
@@ -51,32 +63,38 @@ defmodule AlchemicalReductionTest do
 
   describe ".reduce/1" do
     test "it removes reacting units" do
-      expected = String.codepoints("dabCBAcaDA")
-      actual = "dabAcCaCBAcCcaDA" |> String.codepoints |> reduce_polymer
+      expected = "dabCBAcaDA"
+      actual = reduce_polymer("dabAcCaCBAcCcaDA")
 
       assert actual == expected
     end
 
     test "bigger units" do
-      expected = String.codepoints("i")
-      actual = "yZzYilLqQqBbQkKofFOXxjLLllCUuYyVrRvYycJ" |> String.codepoints |> reduce_polymer
+      expected = "i"
+      actual = reduce_polymer("yZzYilLqQqBbQkKofFOXxjLLllCUuYyVrRvYycJ")
 
       assert actual == expected
     end
 
     test "reduction on first two units" do
-      expected = String.codepoints("aCBAcaDA")
-      actual = "cCaCBAcCcaDA" |> String.codepoints |> reduce_polymer
+      expected = "aCBAcaDA"
+      actual = reduce_polymer("cCaCBAcCcaDA")
 
       assert actual == expected
     end
   end
 end
 
-"input.txt"
-|> File.read!
-|> String.trim
-|> String.codepoints
+units = 
+  "input.txt"
+  |> File.read!
+  |> String.trim
+
+units
 |> AlchemicalReduction.reduce_polymer
-|> length
+|> String.length
 |> IO.inspect(label: "Number of units")
+
+units
+|> AlchemicalReduction.shortest_reduction
+|> IO.inspect(label: "Shortest reduction")
