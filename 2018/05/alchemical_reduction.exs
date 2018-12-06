@@ -2,22 +2,22 @@ defmodule AlchemicalReduction do
   def reduce_polymer(polymer) do
     polymer
     |> String.codepoints
-    |> reduce([]) 
+    |> reduce([])
     |> Enum.reverse
     |> Enum.join
   end
 
   def shortest_reduction(polymer) do
     ~w(a b c d e f g h i j k l m n o p q r s t u v w x y z)
-    |> Stream.map(fn unit -> polymer |> String.replace(unit, "") |> String.replace(String.upcase(unit), "") end) 
+    |> Stream.map(fn unit -> polymer |> String.replace(unit, "") |> String.replace(String.upcase(unit), "") end)
     |> Stream.map(&reduce_polymer/1)
     |> Stream.map(&String.length/1)
     |> Enum.min
   end
-  
+
   def opposite?(a, b) do
-    {String.downcase(b), String.upcase(a)} == {a, b} || 
-      {String.upcase(b), String.downcase(a)} == {a, b}  
+    {String.downcase(b), String.upcase(a)} == {a, b} ||
+      {String.upcase(b), String.downcase(a)} == {a, b}
   end
 
   defp reduce([a, b | rest], previous) do
@@ -31,6 +31,7 @@ defmodule AlchemicalReduction do
     end
   end
   defp reduce([a], previous), do: [a | previous]
+  defp reduce([], previous), do: previous
 end
 
 ExUnit.start
@@ -82,10 +83,14 @@ defmodule AlchemicalReductionTest do
 
       assert actual == expected
     end
+
+    test "reduction on short opposites" do
+      assert reduce_polymer("cbaABC") == ""
+    end
   end
 end
 
-units = 
+units =
   "input.txt"
   |> File.read!
   |> String.trim
