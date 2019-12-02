@@ -30,6 +30,24 @@ defmodule Part1 do
   end
 end
 
+defmodule Part2 do
+  def search_pair_for(intcode, output) do
+    res =
+      for noun <- 0..99, verb <- 0..99 do
+        {noun, verb, run_with_noun_and_verb(intcode, noun, verb)}
+      end
+    Enum.filter(res, &(match?({_, _, ^output}, &1)))
+  end
+
+  defp run_with_noun_and_verb(intcode, noun, verb) do
+    intcode
+    |> List.replace_at(1, noun)
+    |> List.replace_at(2, verb)
+    |> Part1.run()
+    |> Enum.at(0)
+  end
+end
+
 ExUnit.start()
 
 defmodule Part1Test do
@@ -49,9 +67,14 @@ input =
   |> String.trim()
   |> String.split(",")
   |> Enum.map(&String.to_integer/1)
-  |> IO.inspect()
 
 input
+|> List.replace_at(1, 12)
+|> List.replace_at(2, 2)
 |> Part1.run()
 |> Enum.at(0)
-|> IO.inspect(label: "Answer")
+|> IO.inspect(label: "Part 1")
+
+input
+|> Part2.search_pair_for(19690720)
+|> IO.inspect(label: "Part 2")
