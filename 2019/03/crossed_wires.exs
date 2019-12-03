@@ -2,7 +2,6 @@ defmodule Part1 do
   def closest_intersection(wire1, wire2) do
     wire1
     |> intersections(wire2)
-    |> Enum.reject(&is_nil/1)
     |> Enum.map(&taxicab_distance({0, 0}, &1))
     |> Enum.sort(&(&1 <= &2))
     |> Enum.reject(&(&1 == 0))
@@ -31,7 +30,10 @@ defmodule Part1 do
     segments1 = Enum.zip(wire1, Enum.drop(wire1, 1))
     segments2 = Enum.zip(wire2, Enum.drop(wire2, 1))
 
-    for s1 <- segments1, s2 <- segments2, do: intersection(s1, s2)
+    res = for s1 <- segments1, s2 <- segments2, do: intersection(s1, s2)
+    res
+    |> Enum.reject(&is_nil/1)
+    |> Enum.reject(&(&1 == {0, 0}))
   end
 
   def intersection({{x1, y}, {x2, y}}, {{x, y3}, {x, y4}}) do
@@ -47,6 +49,39 @@ defmodule Part1 do
     if y1 <= y && y <= y2 && x3 <= x && x <= x4, do: {x, y}, else: nil
   end
   def intersection(_, _), do: nil
+end
+
+defmodule Part2 do
+  import Part1
+
+  def best_steps(wire1, wire2) do
+    wire1
+    |> intersections(wire2)
+    |> Enum.map(&(steps_to_intersection(wire1, &1) + steps_to_intersection(wire2, &1)))
+    |> Enum.sort()
+    |> List.first()
+  end
+
+  def steps_to_intersection(wire, crossing) do
+    wire
+    |> steps()
+    |> Enum.find_index(&(&1 == crossing))
+  end
+
+  def steps(wire) do
+    wire = path_to_coordinates(wire)
+
+    wire
+    |> Enum.zip(Enum.drop(wire, 1))
+    |> Enum.reduce([], fn {from, to}, acc -> [from |> steps_to(to) |> Enum.reverse() | acc] end)
+    |> List.flatten()
+    |> Enum.reverse()
+  end
+
+  def steps_to({x, y1}, {x, y2}) when y1 > y2, do: (for y <- 1..abs(y1 - y2), do: {x, y1 - y})
+  def steps_to({x, y1}, {x, y2}) when y1 < y2, do: (for y <- 1..abs(y1 - y2), do: {x, y1 + y})
+  def steps_to({x1, y}, {x2, y}) when x1 > x2, do: (for x <- 1..abs(x1 - x2), do: {x1 - x, y})
+  def steps_to({x1, y}, {x2, y}) when x1 < x2, do: (for x <- 1..abs(x1 - x2), do: {x1 + x, y})
 end
 
 ExUnit.start()
@@ -125,6 +160,45 @@ defmodule Part1Test do
   end
 end
 
+defmodule Part2Test do
+  use ExUnit.Case
+  import Part2
+
+  describe "steps_to/2" do
+    test "when we go up" do
+      assert steps_to({-1, -2}, {-1, 3}) == [{-1, -1}, {-1, 0}, {-1, 1}, {-1, 2}, {-1, 3}]
+    end
+
+    test "when we go down" do
+      assert steps_to({-1, -2}, {-1, -4}) == [{-1, -3}, {-1, -4}]
+    end
+
+    test "when we go left" do
+      assert steps_to({-1, -2}, {-3, -2}) == [{-2, -2}, {-3, -2}]
+    end
+
+    test "when we go right" do
+      assert steps_to({-1, -2}, {2, -2}) == [{0, -2}, {1, -2}, {2, -2}]
+    end
+  end
+
+  describe "steps/1" do
+    test "small numbers" do
+      wire = ~w(U3 R1 D1 R1 D1)
+      assert steps(wire) == [{0, 1}, {0, 2}, {0, 3}, {1, 3}, {1, 2}, {2, 2}, {2, 1}]
+    end
+  end
+
+  describe "best_steps/1" do
+    test "first example" do
+      wire1 = ~w(R75 D30 R83 U83 L12 D49 R71 U7 L72)
+      wire2 = ~w(U62 R66 U55 R34 D71 R55 D58 R83)
+
+      assert Part2.best_steps(wire1, wire2) + 2 == 610
+    end
+  end
+end
+
 input =
   "input.txt"
   |> File.read!()
@@ -133,3 +207,4 @@ input =
 
 [wire1, wire2] = input
 Part1.closest_intersection(wire1, wire2) |> IO.inspect(label: "Part1")
+Part2.best_steps(wire1, wire2) |> IO.inspect(label: "Part2")
