@@ -37,18 +37,21 @@ defmodule Part1 do
   end
 
   def intersection({{x1, y}, {x2, y}}, {{x, y3}, {x, y4}}) do
-    {x1, x2} = if x1 < x2, do: {x1, x2}, else: {x2, x1}
-    {y3, y4} = if y3 < y4, do: {y3, y4}, else: {y4, y3}
+    {x1, x2} = sort(x1, x2)
+    {y3, y4} = sort(y3, y4)
 
-    if x1 <= x && x <= x2 && y3 <= y && y <= y4, do: {x, y}, else: nil
+    if between?(x, x1, x2) && between?(y, y3, y4), do: {x, y}, else: nil
   end
   def intersection({{x, y1}, {x, y2}}, {{x3, y}, {x4, y}}) do
-    {y1, y2} = if y1 < y2, do: {y1, y2}, else: {y2, y1}
-    {x3, x4} = if x3 < x4, do: {x3, x4}, else: {x4, x3}
+    {y1, y2} = sort(y1, y2)
+    {x3, x4} = sort(x3, x4)
 
-    if y1 <= y && y <= y2 && x3 <= x && x <= x4, do: {x, y}, else: nil
+    if between?(y, y1, y2) && between?(x, x3, x4), do: {x, y}, else: nil
   end
   def intersection(_, _), do: nil
+
+  defp sort(a, b), do: if a < b, do: {a, b}, else: {b, a}
+  defp between?(x, a, b), do: a <= x && x <= b
 end
 
 defmodule Part2 do
