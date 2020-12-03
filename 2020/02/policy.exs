@@ -1,8 +1,15 @@
+defmodule Policy do
+  @callback valid?(String.t(), String.t(), pos_integer(), pos_integer())
+end
 
 defmodule OldPolicy do
+  @behaviour Policy
+
   def valid?(%{"password" => password, "char" => char, "min" => min, "max" => max}) do
     valid?(password, char, String.to_integer(min), String.to_integer(max))
   end
+
+  @impl
   def valid?(password, char, min, max) do
     occurrences =
       password
@@ -14,9 +21,13 @@ defmodule OldPolicy do
 end
 
 defmodule NewPolicy do
+  @behaviour Policy
+
   def valid?(%{"password" => password, "char" => char, "min" => min, "max" => max}) do
     valid?(password, char, String.to_integer(min), String.to_integer(max))
   end
+
+  @impl
   def valid?(password, char, min, max) do
     (String.at(password, min - 1) == char) != (String.at(password, max - 1) == char)
   end
