@@ -17,6 +17,38 @@ defmodule Traversal do
   end
 end
 
+ExUnit.start()
+
+defmodule TraversalTest do
+  use ExUnit.Case
+
+  @map [
+    "..##.......",
+    "#...#...#..",
+    ".#....#..#.",
+    "..#.#...#.#",
+    ".#...##..#.",
+    "..#.##.....",
+    ".#.#.#....#",
+    ".#........#",
+    "#.##...#...",
+    "#...##....#",
+    ".#..#...#.#"
+  ]
+
+  for {{r, d} = dir, expected} <- [
+    {{1, 1}, 2},
+    {{3, 1}, 7},
+    {{5, 1}, 3},
+    {{7, 1}, 4},
+    {{1, 2}, 2}
+  ] do
+    test "Going #{r} right and #{d} down returns #{expected}" do
+      assert Traversal.tree_count(@map, unquote(dir)) == unquote(expected)
+    end
+  end
+end
+
 input
 |> Traversal.tree_count({3, 1})
 |> IO.inspect(label: "Part 1")
