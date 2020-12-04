@@ -40,3 +40,17 @@ input =
 input
 |> Enum.count(&Passport.valid?/1)
 |> IO.inspect(label: "Part 1")
+
+rules = %{
+  "iyr" => &(&1 =~ ~r/\d\d[1-2]\d/),
+  "byr" => &(&1 =~ ~r/19[^0-1]\d|200[0-2]/),
+  "eyr" => &(&1 =~ ~r/20(2\d|30)/),
+  "hgt" => &(&1 =~ ~r/1([5-8]\d|9[0-3])cm|(59|6\d|7[0-6])in/),
+  "hcl" => &(&1 =~ ~r/#[0-9a-f]{6}/),
+  "ecl" => &(&1 =~ ~r/amb|blu|brn|gry|grn|hzl|oth/),
+  "pid" => &(&1 =~ ~r/\d{9}/)
+}
+
+input
+|> Enum.count(&Passport.valid?(&1, rules))
+|> IO.inspect(label: "Part 2")
