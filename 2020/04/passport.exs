@@ -1,4 +1,7 @@
 defmodule Passport do
+  @type field_pair() :: {String.t(), String.t()}
+  @type passport() :: list(field_pair())
+
   @mandatory_fields ~w(byr iyr eyr hgt hcl ecl pid)
   @mandatory_fields_length length(@mandatory_fields)
 
@@ -12,7 +15,7 @@ defmodule Passport do
     end)
   end
 
-  @spec split_passports(list(String.t())) :: list(tuple())
+  @spec split_passports(list(String.t())) :: list(passport())
   def split_passports(passports) do
     Enum.reduce(passports, [], fn
       elem, [] ->
@@ -25,19 +28,30 @@ defmodule Passport do
     end)
   end
 end
-optionals = ~w(cid)
 
-input =
+defmodule InputSanitizer do
+  @optionals ~w(cid)
+
+  @type field_pair() :: {String.t(), String.t()}
+
+  @spec sanitize(String.t()) :: list(field_pair())
+  def sanitize(input) do
+    input
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+    |> String.split()
+    |> Enum.map(&(&1 |> String.split(":") |> List.to_tuple()))
+    |> Enum.reject(fn {field, _} -> field in @optionals end)
+  end
+end
+
+passports =
   "input.txt"
   |> File.read!()
-  |> String.replace(~r/\s+/, " ")
-  |> String.trim()
-  |> String.split()
-  |> Enum.map(&(&1 |> String.split(":") |> List.to_tuple()))
-  |> Enum.reject(fn {field, _} -> field in optionals end)
+  |> InputSanitizer.sanitize()
   |> Passport.split_passports()
 
-input
+passports
 |> Enum.count(&Passport.valid?/1)
 |> IO.inspect(label: "Part 1")
 
@@ -51,6 +65,6 @@ rules = %{
   "pid" => &(&1 =~ ~r/\d{9}/)
 }
 
-input
+passports
 |> Enum.count(&Passport.valid?(&1, rules))
 |> IO.inspect(label: "Part 2")
