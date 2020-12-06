@@ -38,3 +38,9 @@ passes
 |> Enum.map(&BoardingPass.seat_id/1)
 |> Enum.max()
 |> IO.inspect(label: "Part 1")
+
+passes
+|> Enum.map(&BoardingPass.seat/1)
+|> Enum.reduce(%{}, fn {row, _} = seat, statuses -> Map.update(statuses, row, [seat], &([seat | &1])) end)
+|> Enum.reject(fn {_, seats} -> length(seats) == 8 end)
+|> IO.inspect(label: "Part 2")
