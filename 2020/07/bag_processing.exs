@@ -42,6 +42,17 @@ defmodule BagProcessing do
 
     {bag, content}
   end
+
+  @spec count_nested_bags(bag_specifications(), bag_color()) :: pos_integer()
+  def count_nested_bags(specs, bag) do
+    nested_bags(specs, specs[bag])
+  end
+  defp nested_bags(specs, []), do: 0
+  defp nested_bags(specs, bags) do
+    bags
+    |> Enum.map(fn {count, color} -> count * (nested_bags(specs, specs[color]) + 1) end)
+    |> Enum.sum()
+  end
 end
 
 ExUnit.start()
@@ -65,6 +76,20 @@ defmodule BagProcessingTest do
     assert BagProcessing.expand_specs(@specs, @specs["light red"], []) ==
       ["bright white", "shiny gold", "dark olive", "faded blue", "dotted black", "vibrant plum", "muted yellow"]
   end
+
+  test "count nested bags" do
+    specs = %{
+      "shiny gold" => [{2, "red"}],
+      "red" => [{2, "orange"}],
+      "orange" => [{2, "yellow"}],
+      "yellow" => [{2, "green"}],
+      "green" => [{2, "blue"}],
+      "blue" => [{2, "violet"}],
+      "violet" => []
+    }
+
+    assert BagProcessing.count_nested_bags(specs, "shiny gold") == 126
+  end
 end
 
 specs =
@@ -76,3 +101,7 @@ specs
 |> BagProcessing.expand_specs()
 |> Enum.count(fn {_, contents} -> "shiny gold" in contents end)
 |> IO.inspect(label: "Part 1")
+
+specs
+|> BagProcessing.count_nested_bags("shiny gold")
+|> IO.inspect(label: "Part 2")
