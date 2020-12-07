@@ -6,6 +6,7 @@ defmodule BagProcessing do
   @content_regex ~r/(\d)\s(\w+\s\w+)/
   @bag_regex ~r/\w+\s\w+/
 
+  @spec expand_specs(bag_specifications()) :: %{bag_color() => list(bag_color())}
   def expand_specs(specifications) do
     specifications
     |> Enum.map(fn {c, s} -> {c, expand_specs(specifications, s, [])} end)
@@ -19,7 +20,16 @@ defmodule BagProcessing do
     |> Enum.uniq()
   end
 
-  def to_specs(line) do
+  @spec to_specs(list(String.t())) :: bag_specifications()
+  def to_specs(lines) do
+    lines
+    |> String.split(".\n", trim: true)
+    |> Enum.map(&to_spec/1)
+    |> Enum.into(%{})
+  end
+
+  @spec to_spec(String.t()) :: {bag_color(), bag_content()}
+  def to_spec(line) do
     content =
       @content_regex
       |> Regex.scan(line, capture: :all_but_first)
@@ -57,11 +67,12 @@ defmodule BagProcessingTest do
   end
 end
 
-"input.txt"
-|> File.read!()
-|> String.split(".\n", trim: true)
-|> Enum.map(&BagProcessing.to_specs/1)
-|> Enum.into(%{})
+specs =
+  "input.txt"
+  |> File.read!()
+  |> BagProcessing.to_specs()
+
+specs
 |> BagProcessing.expand_specs()
 |> Enum.count(fn {_, contents} -> "shiny gold" in contents end)
 |> IO.inspect(label: "Part 1")
