@@ -13,8 +13,7 @@ defmodule BoardingPass do
   defp replacement("R"), do: "1"
   defp replacement("L"), do: "0"
 
-  defp row_column(partition) do
-    {row, col} = String.split_at(partition, 7)
+  defp row_column(<<row::bytes-size(7)>> <> <<col::bytes-size(3)>>) do
     {String.to_integer(row, 2), String.to_integer(col, 2)}
   end
 end
