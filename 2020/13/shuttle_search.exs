@@ -11,12 +11,10 @@ defmodule ShuttleSearch do
   end
 
   def earliest_offset(ids, start \\ 0) do
-    {step, offset, ids} =
-      ids
-      |> offset_to_max()
-      # |> IO.inspect()
+    {step, offset, ids} = offset_to_max(ids)
 
-    start
+    step
+    |> first_multiple_of(start)
     |> Stream.iterate(&(&1 + step))
     |> Stream.take_while(&!match_offsets?(&1, ids))
     |> Enum.to_list()
@@ -26,7 +24,6 @@ defmodule ShuttleSearch do
   end
 
   def match_offsets?(number, ids) do
-    # IO.inspect(number)
     Enum.all?(ids, fn {id, offset} -> rem(number + offset, id) == 0 end)
   end
 
@@ -41,6 +38,10 @@ defmodule ShuttleSearch do
       |> Enum.reject(&(elem(&1, 0) == 0))
 
     {max, max_index, ids_with_offsets}
+  end
+
+  def first_multiple_of(number, start) do
+    (div(start, number) + 1) * number
   end
 end
 
@@ -65,6 +66,11 @@ defmodule ShuttleSearchTest do
   test "offset_to_max/1" do
     assert offset_to_max([7, 13, 0, 0, 59, 0, 31, 19]) == {59, 4, [{7, -4}, {13, -3}, {59, 0}, {31, 2}, {19, 3}]}
   end
+
+  test "first_multiple_of/2" do
+    assert first_multiple_of(8, 30) == 32
+    assert first_multiple_of(3, 30) == 33
+  end
 end
 
 [timestamp, ids] =
@@ -84,5 +90,5 @@ timestamp
 |> IO.inspect(label: "Part 1")
 
 ids
-|> ShuttleSearch.earliest_offset(100000000000000)
+|> ShuttleSearch.earliest_offset(100_000_000_000_000)
 |> IO.inspect(label: "Part 2")
