@@ -1,13 +1,10 @@
 defmodule Measurements do
   def increases(depths, window_size \\ 1) do
-    windows =
-      depths
-      |> Enum.chunk_every(window_size, 1, :discard)
-      |> Enum.map(&Enum.sum/1)
-
-    windows
-    |> Enum.with_index()
-    |> Enum.count(fn {e, i} -> i > 0 && e > Enum.at(windows, i - 1) end)
+    depths
+    |> Enum.chunk_every(window_size, 1, :discard)
+    |> Enum.map(&Enum.sum/1)
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.count(fn [m1, m2] -> m2 > m1 end)
   end
 end
 
