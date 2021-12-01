@@ -1,8 +1,9 @@
 defmodule Measurements do
   def increases(depths, window_size \\ 1) do
     windows =
-      for i <- 0..(length(depths) - window_size),
-        do: depths |> Enum.slice(i, window_size) |> Enum.sum()
+      depths
+      |> Enum.chunk_every(window_size, 1, :discard)
+      |> Enum.map(&Enum.sum/1)
 
     windows
     |> Enum.with_index()
@@ -35,7 +36,6 @@ depths =
 depths
 |> Measurements.increases()
 |> IO.inspect(label: "Increases (1)")
-
 
 depths
 |> Measurements.increases(3)
