@@ -1,21 +1,18 @@
 defmodule Diagnostic do
 
-  def gamma(binaries) do
-    binaries
-    |> Enum.map(&String.graphemes/1)
-    |> transpose()
-    |> Enum.reduce([], fn line, acc -> if Enum.count(line, &(&1 == "1")) > Enum.count(line, &(&1 == "0")), do: [1 | acc], else: [0 | acc] end)
-    |> Enum.reverse()
-    |> Enum.join()
-    |> String.to_integer(2)
-  end
+  # Improved version based on Jose Valim's code: https://www.twitch.tv/videos/1223929784
+  def gamma(binaries, bin_length) do
+    digits = Enum.map(binaries, &String.to_charlist/1)
+    half = div(length(digits), 2)
 
-  # Taken from https://gist.github.com/pmarreck/6e054c162844e9d83d89
-  defp transpose([[x | xs] | xss]) do
-    [[x | (for [h | _] <- xss, do: h)] | transpose([xs | (for [_ | t] <- xss, do: t)])]
+    gammas =
+      for pos <- 0..bin_length - 1 do
+        zeroes = Enum.count_until(digits, &(Enum.at(&1, pos) == ?0), half + 1)
+        if zeroes > half, do: ?0, else: ?1
+      end
+
+    List.to_integer(gammas, 2)
   end
-  defp transpose([[] | xss]), do: transpose(xss)
-  defp transpose([]), do: []
 end
 
 binaries =
@@ -23,6 +20,11 @@ binaries =
   |> File.read!()
   |> String.split("\n", trim: true)
 
-gamma = Diagnostic.gamma(binaries)
-epsilon = 4095 - gamma
+bin_length =
+  binaries
+  |> List.first()
+  |> String.length()
+
+gamma = Diagnostic.gamma(binaries, bin_length)
+epsilon = (2 ** bin_length - 1) - gamma
 IO.inspect(gamma * epsilon, label: "Part 1")
