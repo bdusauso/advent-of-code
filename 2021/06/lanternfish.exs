@@ -2,12 +2,13 @@ defmodule Lanternfish do
   def population(population, 0), do: Enum.sum(population)
   def population(population, days) do
     new_population =
-      for i <- 0..7 do
-        if i == 6,
-          do: List.first(population) + Enum.at(population, 7),
-          else: Enum.at(population, i + 1)
+      for i <- 0..8 do
+        case i do
+          6 -> List.first(population) + Enum.at(population, 7)
+          8 -> Enum.at(population, 0)
+          i -> Enum.at(population, i + 1)
+        end
       end
-    new_population = List.insert_at(new_population, -1, Enum.at(population, 0))
 
     population(new_population, days - 1)
   end
@@ -28,6 +29,7 @@ defmodule LanternfishTest do
     count_per_ages = Lanternfish.count_per_ages([3,4,3,1,2])
     assert Lanternfish.population(count_per_ages, 18) == 26
     assert Lanternfish.population(count_per_ages, 80) == 5934
+    assert Lanternfish.population(count_per_ages, 256) == 26984457539
   end
 end
 
