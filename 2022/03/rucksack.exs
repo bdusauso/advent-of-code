@@ -19,7 +19,6 @@ defmodule Rucksack do
     |> Enum.map(&common_item/1)
     |> Enum.map(&priority/1)
     |> Enum.sum()
-    |> dbg()
   end
 
   defp split_compartments(rucksack) do
@@ -27,29 +26,13 @@ defmodule Rucksack do
     Enum.chunk_every(rucksack, items_in_compartments)
   end
 
-  defp common_item([list1, list2]) do
-    list1 = unique_elems(list1)
-    list2 = unique_elems(list2)
-
-    # Find the common elements between the two first lists
-    list2
-    |> Enum.reduce([], fn item, acc -> if item in list1, do: [item | acc], else: acc end)
+  defp common_item(enumerables) do
+    enumerables
+    |> Enum.map(&MapSet.new/1)
+    |> Enum.reduce(fn elem, acc -> MapSet.intersection(acc, elem) end)
+    |> Enum.to_list()
     |> List.first()
   end
-
-  defp common_item([list1, list2, list3]) do
-    list1 = unique_elems(list1)
-    list2 = unique_elems(list2)
-    list3 = unique_elems(list3)
-
-    # Find the common elements between the two first lists
-    list2
-    |> Enum.reduce([], fn item, acc -> if item in list1, do: [item | acc], else: acc end)
-    |> Enum.reduce([], fn item, acc -> if item in list3, do: [item | acc], else: acc end)
-    |> List.first()
-  end
-
-  defp unique_elems(list), do: list |> Enum.sort() |> Enum.uniq()
 
   defp priority(item), do: Enum.find_index(@priorities, &(&1 == item)) + 1
 end
