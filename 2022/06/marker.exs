@@ -10,8 +10,8 @@ defmodule Marker do
   defp marker_index(buffer, count) do
     buffer
     |> String.to_charlist()
-    |> Enum.chunk_every(count, 1)
-    |> Enum.map(&Enum.uniq/1)
+    |> Stream.chunk_every(count, 1)
+    |> Stream.map(&Enum.uniq/1)
     |> Enum.find_index(&(length(&1) == count))
     |> Kernel.+(count)
   end
