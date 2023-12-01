@@ -12,7 +12,7 @@ defmodule Trebuchet do
     "zero" => "0"
   }
 
-  @spelling_regex ~r/(zero|one|two|three|four|five|six|seven|eight|nine)/
+  @spelling_regex ~r/(?=(zero|one|two|three|four|five|six|seven|eight|nine))/
 
   def calibrate(str, replace \\ false) do
     str = if replace, do: replace_spelling(str), else: str
