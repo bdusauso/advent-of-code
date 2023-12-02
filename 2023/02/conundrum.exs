@@ -5,6 +5,19 @@ defmodule Conundrum do
     Enum.all?(game, fn {r1, g1, b1} -> r1 <= r2 && g1 <= g2 && b1 <= b2 end)
   end
 
+  def minimum(game) do
+    minimums =
+      for i <- 0..2,
+          do:
+            game
+            |> Enum.map(&elem(&1, i))
+            |> Enum.max()
+
+    List.to_tuple(minimums)
+  end
+
+  def power({r, g, b}), do: r * g * b
+
   def parse(line) do
     %{"game_number" => game_number, "content" => content} =
       Regex.named_captures(@game_number, line)
@@ -70,15 +83,30 @@ defmodule ConundrumTest do
 
     assert actual == [true, true, false, false, true]
   end
+
+  test "minimum/1" do
+    assert Conundrum.minimum([{4, 0, 3}, {1, 2, 6}, {0, 2, 0}]) == {4, 2, 6}
+  end
+
+  test "power/1" do
+    assert Conundrum.power({4, 2, 6}) == 48
+  end
 end
 
-input =
+games =
   "input.txt"
   |> File.stream!()
+  |> Enum.map(&Conundrum.parse/1)
 
-input
-|> Enum.map(&Conundrum.parse/1)
+games
 |> Enum.filter(fn {_, game} -> Conundrum.possible?(game, {12, 13, 14}) end)
 |> Enum.map(&elem(&1, 0))
 |> Enum.sum()
 |> IO.inspect(label: "Part 1")
+
+games
+|> Enum.map(&elem(&1, 1))
+|> Enum.map(&Conundrum.minimum/1)
+|> Enum.map(&Conundrum.power/1)
+|> Enum.sum()
+|> IO.inspect(label: "Part 2")
