@@ -1,0 +1,35 @@
+# AoC 2023 Day 9
+
+## Section
+
+```elixir
+defmodule MirageMaintenance do
+  def next_value(history) do
+    case Enum.all?(history, &(&1 == 0)) do
+      true -> 0
+      false -> List.last(history) + (history |> differences() |> next_value())
+    end
+  end
+
+  def differences(list), do: differences(list, [])
+
+  defp differences([_], acc), do: Enum.reverse(acc)
+  defp differences([a, b | rest], acc), do: differences([b | rest], [b - a | acc])
+end
+```
+
+```elixir
+MirageMaintenance.differences([1, 2, 4, 7])
+```
+
+```elixir
+MirageMaintenance.next_value([0, 3, 6, 9, 12, 15])
+```
+
+```elixir
+MirageMaintenance.next_value([1, 3, 6, 10, 15, 21])
+```
+
+```elixir
+MirageMaintenance.next_value([10, 13, 16, 21, 30, 45])
+```
